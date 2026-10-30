@@ -1,5 +1,5 @@
-// hooks get article details for reading 
 import { useState, useEffect } from "react";
+import { api } from "../lib/api"; // Ensure path matches your api file
 
 export function useArticle(id) {
   const [article, setArticle] = useState(null);
@@ -7,22 +7,22 @@ export function useArticle(id) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-   console.log("Article read hook triggered with ID:", id);  
-  if (!id) {
-    console.log("No ID found, skipping fetch.");
-    return;
-  }
+    // 1. Skip if ID is missing or invalid
+    if (!id || id === "undefined" || id === "null") {
+      setIsLoading(false);
+      return;
+    }
 
     const fetchArticle = async () => {
       setIsLoading(true);
+      setError(null);
       try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/articleRead?id=${id}`); //api route
-        if (!response.ok) throw new Error("Article not found");
-        
-        const data = await response.json();
+        // Calls GET /api/articleRead?id=cmvuzyh2w0007ny1smf17qttz
+        const data = await api.getArticleById(id);
         setArticle(data);
       } catch (err) {
-        setError(err.message);
+        setError(err.message || "Article not found");
+        setArticle(null);
         console.error("Fetch article error:", err);
       } finally {
         setIsLoading(false);

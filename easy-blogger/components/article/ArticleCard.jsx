@@ -293,7 +293,7 @@ const { user, profileLoading, userProfile } = useAuth();
             <div className="h-14">
               <h2 
                 className="text-xl font-bold text-[#111827] mb-2 leading-tight font-serif hover:text-[#1ABC9C] cursor-pointer transition-colors duration-150 line-clamp-2" 
-                onClick={() => router.push(`/home/read?id=${article.id}`)} 
+                onClick={() => router.push(`/home/read/${article.id}`)} 
               >
                 {article.title || "Untitled Article"}
               </h2>

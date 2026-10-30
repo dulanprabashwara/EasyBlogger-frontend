@@ -51,8 +51,7 @@ export async function fetchAPI(endpoint, options = {}) {
  */
 export const api = {
   // Articles
-  getArticles: (queryParams = "") => 
-    fetchAPI(`/api/articles${queryParams}`),
+  getArticles: (id) => fetchAPI(`/api/articleRead?id=${id}`),
 
   getArticleBySlug: (slug) => 
     fetchAPI(`/api/articles/${slug}`),
