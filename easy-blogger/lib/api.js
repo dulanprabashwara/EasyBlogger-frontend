@@ -51,8 +51,7 @@ export async function fetchAPI(endpoint, options = {}) {
  */
 export const api = {
   // Articles
-  getArticles: (queryParams = "") => 
-    fetchAPI(`/api/articles${queryParams}`),
+  getArticles: (id) => fetchAPI(`/api/articleRead?id=${id}`),
 
   getArticleBySlug: (slug) => 
     fetchAPI(`/api/articles/${slug}`),
@@ -74,9 +73,8 @@ export const api = {
   getMe: (token) => 
     fetchAPI("/api/users/me", { token }),
 
-  // User Endpoints
   updateProfile: (data, token) =>
-    fetchAPI("/api/users/profile", { method: "PUT", body: data, token }),
+    fetchAPI("/api/users/me", { method: "PUT", body: data, token }),
 
   updateAdminProfile: (data, token) =>
     fetchAPI("/api/admin/profile", { method: "PUT", body: data, token }),
@@ -252,6 +250,9 @@ deleteComment: (commentId, token) =>
 },
   getNewFeed: (page = 1, token = null) => 
     fetchAPI(`/api/homefeed/main?page=${page}`, { token }),
+
+  getPersonalFeed: (page = 1, token = null) =>
+    fetchAPI(`/api/homefeed/personal?page=${page}`, { token }),
 
   getTopUserArticles: (token = null) => 
     fetchAPI(`/api/TopUserArticles`, { token }),
