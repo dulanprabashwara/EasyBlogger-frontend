@@ -115,7 +115,7 @@ export default function PrivateStats() {
                                 topArticles.map((article) => (
                                     <tr key={article.id} 
                                     className="group hover:bg-teal-50 transition-colors cursor-pointer transition-transform hover:scale-102 duration-200"
-                                     onClick={() => router.push(`/home/read?id=${article.id}`)} >
+                                     onClick={() => router.push(`/home/read/${article.id}`)}  >
                                         <td className="py-5 pl-4 rounded-l-2xl border-y border-l border-gray-100">
                                             <p className="font-bold text-[#4a4a4a] truncate max-w-xs">
                                                 {article.title}
