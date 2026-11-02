@@ -23,7 +23,7 @@ export default function RightFeed() {
             <div 
               key={i} 
               className="flex gap-3 mb-4 group cursor-pointer"
-              onClick={() => router.push(`/home/read?id=${item.id}`)}
+              onClick={() => router.push(`/home/read/${article.id}`)} 
             >
               <span className="text-xl font-bold text-gray-200 group-hover:text-teal-500 transition-colors">
                 {i + 1}
