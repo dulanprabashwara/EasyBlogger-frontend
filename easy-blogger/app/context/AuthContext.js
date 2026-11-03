@@ -48,7 +48,7 @@ export function AuthProvider({ children }) {
       const res = await api.getMe(token);
       if (res.success && res.data) {
         setUserProfile(res.data);
-        setIsAdmin(res.data.role === "ADMIN");
+        setIsAdmin(res.data.role === "ADMIN" || res.data.role === "SUPER_ADMIN");
         return res.data;
       }
     } catch (error) {
@@ -101,7 +101,7 @@ export function AuthProvider({ children }) {
         );
         if (res.success && res.data) {
           setUserProfile(res.data);
-          setIsAdmin(res.data.role === "ADMIN");
+          setIsAdmin(res.data.role === "ADMIN" || res.data.role === "SUPER_ADMIN");
           hasSynced.current = true;
         }
       } catch (error) {
@@ -126,7 +126,7 @@ export function AuthProvider({ children }) {
           const res = await api.getMe(token);
           if (res.success && res.data) {
             setUserProfile(res.data);
-            setIsAdmin(res.data.role === "ADMIN");
+            setIsAdmin(res.data.role === "ADMIN" || res.data.role === "SUPER_ADMIN");
             hasSynced.current = true;
             return;
           }

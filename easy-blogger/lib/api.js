@@ -326,5 +326,8 @@ deleteComment: (commentId, token) =>
 
   getAnalyticsCharts: (token) =>
     fetchAPI(`/api/admin/dashboard/analytics-charts`, { method: "GET", token }),
+
+  inviteAdmin: (data, token) =>
+    fetchAPI("/api/admin/invite", { method: "POST", body: data, token }),
 };
 
