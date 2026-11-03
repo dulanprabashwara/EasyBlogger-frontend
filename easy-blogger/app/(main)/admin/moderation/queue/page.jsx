@@ -13,6 +13,7 @@ export default function QueuePage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [userRole, setUserRole] = useState(null);
   const dropdownRef = useRef(null);
 
   const fetchReports = async () => {
@@ -20,6 +21,10 @@ export default function QueuePage() {
       const user = auth.currentUser;
       if (!user) return;
       const token = await user.getIdToken();
+
+      const meResponse = await api.getMe(token);
+      const userData = meResponse.data || meResponse;
+      setUserRole(userData.role);
 
       const response = await api.getAdminReports("?limit=100", token);
 
@@ -119,14 +124,18 @@ export default function QueuePage() {
   };
 
   const getDropdownColor = () => {
-    if (filterStatus === 'pending') return 'bg-[#EAB308] text-white';
-    if (filterStatus === 'reviewed') return 'bg-[#1ABC9C] text-white';
+    if (filterStatus === 'PENDING') return 'bg-[#EAB308] text-white';
+    if (filterStatus === 'REVIEWED') return 'bg-[#1ABC9C] text-white';
     return 'bg-white border border-[#E5E7EB] text-[#6B7280]';
   };
 
   const filteredPosts = posts.filter(post => {
     const statusMatch = filterStatus ? post.status === filterStatus : true;
-    const searchMatch = post.title.toLowerCase().includes(searchQuery.toLowerCase());
+    const cleanSearch = searchQuery.toLowerCase();
+    const searchMatch = 
+      post.title.toLowerCase().includes(cleanSearch) ||
+      post.reason.toLowerCase().includes(cleanSearch) ||
+      post.reporter.toLowerCase().includes(cleanSearch);
     return statusMatch && searchMatch;
   });
 
@@ -162,7 +171,7 @@ export default function QueuePage() {
             <div key={post.id} onClick={() => setSelectedId(post.id)} className={`p-4 rounded-xl border transition-all cursor-pointer ${selectedId === post.id ? "border-[#1ABC9C] bg-white shadow-md ring-1 ring-[#1ABC9C]" : "bg-white border-[#E5E7EB] hover:border-[#1ABC9C]"}`}>
               <div className="flex justify-between items-start mb-1">
                 <span className="font-semibold text-[#111827] text-sm">{post.reason}</span>
-                <div className={`w-2 h-2 rounded-full ${post.status === 'pending' ? 'bg-[#EAB308]' : 'bg-[#1ABC9C]'}`}></div>
+                <div className={`w-2 h-2 rounded-full ${post.status === 'PENDING' ? 'bg-[#EAB308]' : 'bg-[#1ABC9C]'}`}></div>
               </div>
               <h3 className="font-bold text-[#111827] text-sm leading-tight line-clamp-2">{post.title}</h3>
             </div>
@@ -186,23 +195,55 @@ export default function QueuePage() {
             <div className="p-8 flex-1 overflow-y-auto pt-4">
               <h1 className="text-2xl font-bold text-[#111827] mb-6 font-serif">{activePost.title}</h1>
               {activePost.image && <div className="mb-6"><img src={activePost.image} alt="Post content" className="rounded-lg shadow-sm w-full max-h-80 object-cover" /></div>}
-              <p className="text-[#374151] leading-relaxed text-base whitespace-pre-line">{activePost.content}</p>
+              <div 
+                  className="text-[#374151] leading-relaxed text-base prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: activePost.content }}
+              />
             </div>
 
             {/* Conditional Action area*/}
-            <div className="p-6 border-t border-[#E5E7EB] bg-[#F9FAFB] flex justify-end gap-4">
-              {activePost.status === 'DISMISSED' ? (
-                <div className="flex items-center gap-3 bg-[#CCFBF1] text-[#0F766E] px-6 py-2 rounded-full border border-[#1ABC9C] shadow-sm">
-                  <CheckCircle size={18} /><span className="font-bold text-sm">Verified Content</span>
-                </div>
-              ) : (
-                <button onClick={() => handleAction("Keep")} className="group flex items-center gap-3 bg-[#114A3F] text-white pl-6 pr-2 py-2 rounded-full active:scale-95 transition-all shadow-md cursor-pointer">
-                  <span className="font-bold text-sm">Keep</span>
-                  <div className="w-8 h-8 bg-[#4FD1C5] rounded-full flex items-center justify-center text-[#114A3F]"><CheckCircle size={18} /></div>
+            <div className="p-6 border-t border-[#E5E7EB] bg-[#F9FAFB] flex flex-col items-end gap-2">
+              <div className="flex justify-end gap-4 w-full">
+                {activePost.status === 'DISMISSED' ? (
+                  <div className="flex items-center gap-3 bg-[#CCFBF1] text-[#0F766E] px-6 py-2 rounded-full border border-[#1ABC9C] shadow-sm">
+                    <CheckCircle size={18} /><span className="font-bold text-sm">Verified Content</span>
+                  </div>
+                ) : (
+                  <button 
+                    disabled={userRole !== 'SUPER_ADMIN'} 
+                    onClick={() => handleAction("Keep")} 
+                    className={`group flex items-center gap-3 bg-[#114A3F] text-white pl-6 pr-2 py-2 rounded-full transition-all shadow-md ${userRole !== 'SUPER_ADMIN' ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
+                  >
+                    <span className="font-bold text-sm">Keep</span>
+                    <div className="w-8 h-8 bg-[#4FD1C5] rounded-full flex items-center justify-center text-[#114A3F]"><CheckCircle size={18} /></div>
+                  </button>
+                )}
+                
+                <button 
+                  disabled={userRole !== 'SUPER_ADMIN'} 
+                  onClick={() => handleAction("Delete")} 
+                  className={`group flex items-center gap-3 bg-[#134E4A] text-white pl-6 pr-2 py-2 rounded-full transition-all shadow-md ${userRole !== 'SUPER_ADMIN' ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
+                >
+                  <span className="font-bold text-sm">Delete</span>
+                  <div className="w-8 h-8 bg-[#99F6E4] rounded-full flex items-center justify-center text-[#134E4A]"><Trash2 size={18} /></div>
                 </button>
+                
+                <button 
+                  disabled={userRole !== 'SUPER_ADMIN'} 
+                  onClick={() => handleAction("Ban User")} 
+                  className={`group flex items-center gap-3 bg-[#1F2937] text-white pl-6 pr-2 py-2 rounded-full transition-all shadow-md ${userRole !== 'SUPER_ADMIN' ? 'opacity-50 cursor-not-allowed' : 'active:scale-95'}`}
+                >
+                  <span className="font-bold text-sm">Ban</span>
+                  <div className="w-8 h-8 bg-[#F87171] rounded-full flex items-center justify-center text-[#1F2937]"><Ban size={18} /></div>
+                </button>
+              </div>
+
+              {/* WATERMARK */}
+              {userRole !== 'SUPER_ADMIN' && (
+                <p className="text-xs text-gray-400 italic mt-2">
+                  Requires Super Admin privileges to modify content.
+                </p>
               )}
-              <button onClick={() => handleAction("Delete")} className="group flex items-center gap-3 bg-[#134E4A] text-white pl-6 pr-2 py-2 rounded-full active:scale-95 transition-all shadow-md cursor-pointer"><span className="font-bold text-sm">Delete</span><div className="w-8 h-8 bg-[#99F6E4] rounded-full flex items-center justify-center text-[#134E4A]"><Trash2 size={18} /></div></button>
-              <button onClick={() => handleAction("Ban User")} className="group flex items-center gap-3 bg-[#1F2937] text-white pl-6 pr-2 py-2 rounded-full active:scale-95 transition-all shadow-md cursor-pointer"><span className="font-bold text-sm">Ban</span><div className="w-8 h-8 bg-[#F87171] rounded-full flex items-center justify-center text-[#1F2937]"><Ban size={18} /></div></button>
             </div>
           </>
         ) : (

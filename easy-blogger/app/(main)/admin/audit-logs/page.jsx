@@ -148,7 +148,7 @@ export default function AuditLogPage() {
           <div className="relative">
             <select
               value={selectedAction}
-              onChange={(e) => setSelectedAction(e.target.value)}
+              onChange={handleFilterChange(setSelectedAction)}
               className="appearance-none bg-white border border-gray-200 rounded-xl px-5 py-2.5 pr-10 text-xs font-bold text-gray-600 outline-none shadow-sm cursor-pointer uppercase tracking-widest"
             >
               {availableActions.map(action => (

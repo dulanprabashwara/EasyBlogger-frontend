@@ -125,8 +125,12 @@ export default function AdminSupportTickets() {
 
   // Local Search Filtering
   const filteredTickets = tickets.filter(ticket => {
-    const searchMatch = ticket.email.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                        ticket.problem.toLowerCase().includes(searchQuery.toLowerCase());
+    const cleanQuery = searchQuery.toLowerCase();
+    const searchMatch = 
+      ticket.email.toLowerCase().includes(cleanQuery) || 
+      ticket.problem.toLowerCase().includes(cleanQuery) ||
+      ticket.id.toLowerCase().includes(cleanQuery);
+
     return searchMatch;
   });
 
@@ -156,7 +160,7 @@ export default function AdminSupportTickets() {
           </div>
           <div className="relative flex-1 text-[#9CA3AF]">
             <Search className="absolute left-3 top-3 w-4 h-4" />
-            <input suppressHydrationWarning type="text" placeholder="Search by email..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 h-10 bg-white border border-[#E5E7EB] rounded-lg text-sm outline-none focus:border-[#1ABC9C]" />
+            <input suppressHydrationWarning type="text" placeholder="Search by email, ID, or keywords......" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="w-full pl-10 h-10 bg-white border border-[#E5E7EB] rounded-lg text-sm outline-none focus:border-[#1ABC9C]" />
           </div>
         </div>
 

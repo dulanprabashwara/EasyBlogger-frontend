@@ -62,11 +62,23 @@ export default function AdminProfilePage() {
       } catch (metricsErr) {
         console.error("Could not fetch metrics endpoint:", metricsErr);
       }
+      // Determine real label
+      let displayRole = "User";
+      if (userData.role === "SUPER_ADMIN") displayRole = "Super Admin";
+      else if (userData.role === "ADMIN") displayRole = "Admin";
+
+      // Determine dynamic permissions
+      let dynamicPermissions = ["User Data Access", "System API Management"];
+      if (userData.role === "SUPER_ADMIN") {
+        dynamicPermissions.push("Full Content Moderation", "Invite Admins");
+      } else if (userData.role === "ADMIN") {
+        dynamicPermissions.push("Offer Moderation");
+      }
 
       setAdminData({
         name: userData.displayName || userData.username || "Admin User",
         email: userData.email,
-        role: userData.role === "ADMIN" ? "Super Admin" : "User",
+        role: displayRole,
         bio: userData.bio || "No administrative bio provided yet.",
         avatar: userData.avatarUrl || null,
         lastLogin: userData.lastSeen ? new Date(userData.lastSeen).toLocaleString() : new Date().toLocaleString(),
@@ -76,7 +88,7 @@ export default function AdminProfilePage() {
           actions: actionsCount,
           resolved: resolvedCount
         },
-        permissions: ["Full Content Moderation", "User Data Access", "System API Management"],
+        permissions: dynamicPermissions,
         sessions: realSessions.length > 0 ? realSessions : [
           { id: "fallback", device: "Current Device", location: "Active Session", status: "Online Now" }
         ]

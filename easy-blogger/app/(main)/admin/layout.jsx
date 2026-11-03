@@ -9,7 +9,25 @@ import { api } from "../../../lib/api";
 
 export default function AdminLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [userRole, setUserRole] = useState(null);
 
+  useEffect(() => {
+    const fetchRole = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      try {
+        const token = await user.getIdToken();
+        const res = await api.getMe(token);
+        const data = res.data || res;
+        setUserRole(data.role);
+        await api.registerSession(token);
+      } catch (error) {
+        console.error("Failed to fetch admin role:", error);
+      }
+    };
+    fetchRole();
+  }, []);
+  
   // Automatically open sidebar on larger screens
   useEffect(() => {
     const handleResize = () => {
