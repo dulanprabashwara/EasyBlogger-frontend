@@ -30,13 +30,17 @@ function getWordPressError(data) {
 }
 
 function ArticlePublishedContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const urlArticleId = searchParams.get("id");
+
   const {
     articleId,
     article,
     loading,
     wpConnected,
     firebaseUser,
-    router,
+    // router - Removed from here to prevent the duplicate declaration crash
   } = usePublishStatus();
 
   const [wpPostUrl, setWpPostUrl] = useState("");
@@ -144,7 +148,7 @@ function ArticlePublishedContent() {
         return;
       }
 
-      setWpError(getWordPressError(data) || "WordPress publish failed. Please try again.");
+        setWpError(getWordPressError(data) || "WordPress publish failed. Please try again.");
     } catch {
       setWpError("Could not reach server. Please try again.");
     } finally {
@@ -233,7 +237,16 @@ function ArticlePublishedContent() {
         </>
       }
       buttonText="View your article"
-      onButtonClick={() => router.push("/stories/published")}
+      onButtonClick={() => {
+        // Navigate using the ID extracted from the URL, with a fallback just in case
+        if (urlArticleId) {
+          router.push(`/home/read/${urlArticleId}`);
+        } else if (articleId) {
+          router.push(`/home/read/${articleId}`);
+        } else {
+          router.push("/stories/published");
+        }
+      }}
     >
       <InfoCard icon={BookOpen} title="Article title">
         <p className="mt-0.5 text-base font-bold text-gray-800 leading-snug line-clamp-2">{article.title}</p>
