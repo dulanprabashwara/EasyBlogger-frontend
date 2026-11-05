@@ -14,7 +14,7 @@ export default function PublicStats() {
 
 
   return (
-    <div className='scale-90'>
+    <div className="w-full max-w-7xl mx-auto px-4 py-4">
 
          
     <div className="w-full bg-[#f0fdf9] p-4 rounded-4xl mb-10">

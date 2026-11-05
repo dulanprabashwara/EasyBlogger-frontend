@@ -1,6 +1,7 @@
 'use client';
 
-import { Star, Loader2 } from 'lucide-react';
+import { useState } from 'react';
+import { Star, Loader2, ChevronLeft, ChevronRight } from 'lucide-react';
 import ArticleCard from '../../../../components/article/ArticleCard';
 // Import your new hook
 import { useTopUserArticles } from '../../../../hooks/feeds/useTopUserArticles'; 
@@ -12,6 +13,7 @@ export default function PrivateStats() {
     const { articles, isLoading } = useTopUserArticles();
     const { userProfile } = useAuth();
     const router = useRouter();
+    const [currentIndex, setCurrentIndex] = useState(0);
     
     // The backend already sorts by trending score and limits to top 5
     const topArticles = articles || [];
@@ -21,8 +23,11 @@ export default function PrivateStats() {
       ? (topArticles.reduce((acc, curr) => acc + (curr.averageRating || 0) * (curr.ratingCount || 0), 0) / totalRatings).toFixed(1) 
       : "0.0";
 
+    const canPrev = currentIndex > 0;
+    const canNext = currentIndex < topArticles.length - 1;
+
     return (
-        <div className="overflow-hidden flex flex-col p-4 scale-90">
+        <div className="w-full max-w-7xl mx-auto flex flex-col p-4">
             <div className="bg-[#f0fdf9] w-full rounded-4xl mb-10 gap-20 p-5 flex flex-col md:flex-row">
                 <div className="flex gap-7 flex-col font-[Georgia] shrink-0">
                     <div className="flex gap-3">
@@ -58,25 +63,71 @@ export default function PrivateStats() {
                             <Loader2 className="w-6 h-6 animate-spin text-[#1ABC9C]" />
                         </div>
                     ) : (
-                        <div className="flex gap-5 overflow-x-auto bg-white p-3 rounded-2xl mb-3 items-start">
-                            {topArticles.map((article) => {
-                                // Provide default author to ArticleCard so it displays the user profile
-                                const articleWithAuthor = {
-                                    ...article,
-                                    author: {
-                                        displayName: userProfile?.displayName,
-                                        avatarUrl: userProfile?.avatarUrl,
-                                        username: userProfile?.username,
-                                        id: userProfile?.id
-                                    }
-                                };
-                                return (
-                                    <div key={article.id} className="bg-white w-160 shrink-0 px-4 border-2 rounded-2xl border-[#e5e7eb] h-fit">
-                                        <ArticleCard article={articleWithAuthor} />
-                                    </div>
-                                );
-                            })}
-                            {topArticles.length === 0 && <p className="text-gray-400 p-4">No articles found.</p>}
+                        <div className="relative">
+                            {/* Prev button */}
+                            {canPrev && (
+                                <button
+                                    onClick={() => setCurrentIndex((i) => i - 1)}
+                                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-[#1abc9c] hover:scale-110 transition-all -translate-x-5"
+                                    aria-label="Previous article"
+                                >
+                                    <ChevronLeft className="w-5 h-5" />
+                                </button>
+                            )}
+
+                            {/* Next button */}
+                            {canNext && (
+                                <button
+                                    onClick={() => setCurrentIndex((i) => i + 1)}
+                                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-[#1abc9c] hover:scale-110 transition-all translate-x-5"
+                                    aria-label="Next article"
+                                >
+                                    <ChevronRight className="w-5 h-5" />
+                                </button>
+                            )}
+
+                            {/* Slider track */}
+                            <div className="overflow-hidden rounded-2xl">
+                                <div
+                                    className="flex transition-transform duration-500 ease-out"
+                                    style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+                                >
+                                    {topArticles.map((article) => {
+                                        // Provide default author to ArticleCard so it displays the user profile
+                                        const articleWithAuthor = {
+                                            ...article,
+                                            author: {
+                                                displayName: userProfile?.displayName,
+                                                avatarUrl: userProfile?.avatarUrl,
+                                                username: userProfile?.username,
+                                                id: userProfile?.id
+                                            }
+                                        };
+                                        return (
+                                            <div key={article.id} className="w-full flex-shrink-0 px-4 border-2 rounded-2xl border-[#e5e7eb] bg-white h-fit">
+                                                <ArticleCard article={articleWithAuthor} />
+                                            </div>
+                                        );
+                                    })}
+                                    {topArticles.length === 0 && <p className="text-gray-400 p-4">No articles found.</p>}
+                                </div>
+                            </div>
+
+                            {/* Dot indicators */}
+                            {topArticles.length > 1 && (
+                                <div className="flex justify-center gap-2 mt-3">
+                                    {topArticles.map((_, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => setCurrentIndex(i)}
+                                            aria-label={`Go to article ${i + 1}`}
+                                            className={`w-2 h-2 rounded-full transition-colors ${
+                                                i === currentIndex ? 'bg-[#1abc9c]' : 'bg-gray-300'
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+                            )}
                         </div>
                     )}
                     
@@ -115,7 +166,7 @@ export default function PrivateStats() {
                                 topArticles.map((article) => (
                                     <tr key={article.id} 
                                     className="group hover:bg-teal-50 transition-colors cursor-pointer transition-transform hover:scale-102 duration-200"
-                                     onClick={() => router.push(`/home/read/${article.id}`)}  >
+                                     onClick={() => router.push(`/home/read/${article.id}`)}>
                                         <td className="py-5 pl-4 rounded-l-2xl border-y border-l border-gray-100">
                                             <p className="font-bold text-[#4a4a4a] truncate max-w-xs">
                                                 {article.title}
