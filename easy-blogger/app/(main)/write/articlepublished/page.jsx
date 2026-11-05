@@ -233,7 +233,7 @@ function ArticlePublishedContent() {
         </>
       }
       buttonText="View your article"
-      onButtonClick={() => router.push(`/home/read/${article.id}`)}
+      ButtonClick={() => router.push("/stories/published")}
     >
       <InfoCard icon={BookOpen} title="Article title">
         <p className="mt-0.5 text-base font-bold text-gray-800 leading-snug line-clamp-2">{article.title}</p>
