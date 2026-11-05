@@ -98,7 +98,7 @@ export default function SearchArticleCard({ article, savedArticles = [] }) {
 
   // ── Handlers ──────────────────────────────────────────────────────────────
 
-  const handleArticleClick = () => router.push(`/home/read?id=${id}`);
+  const handleArticleClick = () => router.push(`/home/read/${article.id}`);
 
   // Toggles the saved state of the article, syncing with the server.
   const toggleBookmark = async () => {
