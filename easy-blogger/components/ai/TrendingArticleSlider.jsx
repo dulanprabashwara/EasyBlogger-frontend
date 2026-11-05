@@ -85,7 +85,7 @@ export default function TrendingArticleSlider({ articles = [], savedArticles = [
   };
 
   const handleDotClick = (index) => { setCurrentIndex(index); resetInterval(); };
-  const handleArticleClick = (id) => router.push(`/home/read/${article.id}`);
+  const handleArticleClick = (id) => router.push(`/home/read/${id}`);
 
   const handleBookmarkToggle = async (articleId) => {
     if (!user || savingMap[articleId]) return;

@@ -9,7 +9,7 @@ import { useRouter } from "next/navigation";
 export default function InsightsSidebar({ topAIArticles = [], trendingKeywords = [] }) {
   const router = useRouter();
 
-  const handleArticleClick = (id) => router.push(`/home/read/${article.id}`);
+  const handleArticleClick = (id) => router.push(`/home/read/${id}`);
 
   return (
     <div className="insights-sidebar">
