@@ -52,7 +52,7 @@ export default function PrivateStats() {
                     </div>
                 </div>
 
-                <div className="flex gap-5 flex-col overflow-hidden flex-1">
+                <div className="flex gap-5 flex-col flex-1 min-w-0">
                     <div className="px-5 pt-2 flex justify-between font-[Georgia]">
                         <h1 className="font-bold px-5 rounded-2xl text-[#6b6b6b]">{"<<"} High</h1>
                         <h1 className="font-bold px-5 rounded-2xl text-[#6b6b6b]">Low {">>"}</h1>
@@ -63,29 +63,19 @@ export default function PrivateStats() {
                             <Loader2 className="w-6 h-6 animate-spin text-[#1ABC9C]" />
                         </div>
                     ) : (
-                        <div className="relative">
+                        /* Slider: buttons sit outside overflow-hidden so they aren't clipped */
+                        <div className="flex items-center gap-2">
                             {/* Prev button */}
-                            {canPrev && (
-                                <button
-                                    onClick={() => setCurrentIndex((i) => i - 1)}
-                                    className="absolute left-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-[#1abc9c] hover:scale-110 transition-all -translate-x-5"
-                                    aria-label="Previous article"
-                                >
-                                    <ChevronLeft className="w-5 h-5" />
-                                </button>
-                            )}
+                            <button
+                                onClick={() => setCurrentIndex((i) => Math.max(0, i - 1))}
+                                disabled={!canPrev}
+                                className="flex-shrink-0 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-[#1abc9c] hover:scale-110 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                aria-label="Previous article"
+                            >
+                                <ChevronLeft className="w-5 h-5" />
+                            </button>
 
-                            {/* Next button */}
-                            {canNext && (
-                                <button
-                                    onClick={() => setCurrentIndex((i) => i + 1)}
-                                    className="absolute right-0 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-[#1abc9c] hover:scale-110 transition-all translate-x-5"
-                                    aria-label="Next article"
-                                >
-                                    <ChevronRight className="w-5 h-5" />
-                                </button>
-                            )}
-
+                            <div className="flex-1 min-w-0">
                             {/* Slider track */}
                             <div className="overflow-hidden rounded-2xl">
                                 <div
@@ -128,6 +118,17 @@ export default function PrivateStats() {
                                     ))}
                                 </div>
                             )}
+                            </div>{/* end flex-1 min-w-0 */}
+
+                            {/* Next button */}
+                            <button
+                                onClick={() => setCurrentIndex((i) => Math.min(topArticles.length - 1, i + 1))}
+                                disabled={!canNext}
+                                className="flex-shrink-0 w-10 h-10 rounded-full bg-white shadow-lg border border-gray-100 flex items-center justify-center text-gray-400 hover:text-[#1abc9c] hover:scale-110 transition-all disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:scale-100"
+                                aria-label="Next article"
+                            >
+                                <ChevronRight className="w-5 h-5" />
+                            </button>
                         </div>
                     )}
                     
